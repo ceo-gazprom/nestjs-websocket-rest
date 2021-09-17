@@ -8,6 +8,9 @@ export class Group {
   @Column()
   name: string;
 
+  @Column()
+  comment: string;
+
   @Column({
     name: 'date_created',
   })

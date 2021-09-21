@@ -3,6 +3,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { UserModule } from './user';
 import { GroupModule } from './group';
+import { WebsocketClientModule } from './clients/websocket';
 
 @Module({
   imports: [
@@ -23,6 +24,7 @@ import { GroupModule } from './group';
     }),
     UserModule,
     GroupModule,
+    WebsocketClientModule,
   ],
 })
 export class AppModule {}

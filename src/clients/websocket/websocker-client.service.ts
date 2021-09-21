@@ -13,7 +13,7 @@ import { IMessage } from './message.interfase';
 
 
 @Injectable()
-@WebSocketGateway(81, { namespace: 'events', transports: ['websocket'] })
+@WebSocketGateway({ path: '/socket' })
 export class WebsocketClientService implements IWebsocketClientService, OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
   @WebSocketServer() public server: Server;
 
@@ -25,7 +25,7 @@ export class WebsocketClientService implements IWebsocketClientService, OnGatewa
   }
 
   public sendMessage<T>(msg: IMessage<T>): void {
-    this.server.send(msg);
+    this.server.emit('msgToClient', msg);
     this.logger.log('Sended message via websocket!')
   }
 

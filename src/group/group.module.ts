@@ -11,7 +11,6 @@ import { GroupService } from './group.service';
   imports: [
     TypeOrmModule.forFeature([GroupRepository]),
     UserModule,
-    WebsocketClientModule,
   ],
   controllers: [GroupController],
   providers: [{

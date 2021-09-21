@@ -13,7 +13,7 @@ import { IMessage } from './message.interfase';
 
 
 @Injectable()
-@WebSocketGateway({ path: '/socket' })
+@WebSocketGateway()
 export class WebsocketClientService implements IWebsocketClientService, OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
   @WebSocketServer() public server: Server;
 

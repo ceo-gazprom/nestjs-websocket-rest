@@ -16,6 +16,11 @@ import { GROUP_SERVICE } from './di.constants';
 import { IGroupService } from './group.interface';
 import { USER_SERVICE, IUserService, UserIsNotFound } from '../user';
 import {
+  WEBSOCKET_CLIENT_SERVICE,
+  IWebsocketClientService,
+  IMessage,
+} from '../clients/websocket';
+import {
   PaginationQueryDto,
   GroupDto,
   GroupResponseDto,
@@ -30,6 +35,7 @@ export class GroupController {
   constructor(
     @Inject(GROUP_SERVICE) private readonly groupService: IGroupService,
     @Inject(USER_SERVICE) private readonly userService: IUserService,
+    @Inject(WEBSOCKET_CLIENT_SERVICE) private readonly websocketClient: IWebsocketClientService,
   ) {}
 
   @Get('list')
@@ -65,6 +71,12 @@ export class GroupController {
   @HttpCode(HttpStatus.OK)
   async createGroup(@Body() groupData: GroupDto): Promise<GroupResponseDto> {
     const result = await this.groupService.create(groupData);
+    this.websocketClient.sendMessage<GroupResponseDto>({
+      entity: 'group',
+      event: 'create',
+      id: result.id,
+      payload: result,
+    })
     return GroupResponseDto.fromItem(result);
   }
 
@@ -87,6 +99,12 @@ export class GroupController {
     await this.groupService.addUser(groupId, userId);
 
     const result = await this.groupService.getById(groupId);
+    this.websocketClient.sendMessage<GroupUserResponseDto>({
+      entity: 'group',
+      event: 'addUser',
+      id: result.id,
+      payload: result,
+    })
     return GroupUserResponseDto.fromItem(result)
   }
 
@@ -109,6 +127,12 @@ export class GroupController {
     await this.groupService.removeUser(groupId, userId);
 
     const result = await this.groupService.getById(groupId);
+    this.websocketClient.sendMessage<GroupUserResponseDto>({
+      entity: 'group',
+      event: 'removeUser',
+      id: result.id,
+      payload: result,
+    })
     return GroupUserResponseDto.fromItem(result)
   }
 
@@ -125,6 +149,12 @@ export class GroupController {
     const result = await this.groupService.update(id, groupData);
     if (result) {
       const group = await this.groupService.getById(id);
+      this.websocketClient.sendMessage<GroupUserResponseDto>({
+        entity: 'group',
+        event: 'updateGroup',
+        id: group.id,
+        payload: group,
+      })
       return GroupUserResponseDto.fromItem(group);
     }
   }
@@ -138,5 +168,11 @@ export class GroupController {
     const result = await this.groupService.delete(id);
 
     if (!result) throw new GroupIsNotFound(id);
+    this.websocketClient.sendMessage<any>({
+      entity: 'group',
+      event: 'deleteGroup',
+      id: id,
+      payload: '',
+    })
   }
 }
